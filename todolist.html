@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        /* 基本样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #1c1c1e;
+            color: #e5e5e5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+
+            /* 背景图片 */
+            background-image: url('background.jpg'); /* 在这里替换成你图片的路径 */
+            background-size: cover;  /* 让图片覆盖整个页面 */
+            background-position: center;  /* 背景居中 */
+            background-attachment: fixed;  /* 固定背景 */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: rgba(255, 255, 255, 0.3); /* 设置半透明白色背景 */
+            border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #f4f4f7;
+            margin-bottom: 20px;
+        }
+
+        /* 添加 Todo 的输入框和按钮 */
+        .add-todo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .add-todo input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景 */
+            color: #333;
+            margin-right: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .add-todo input:focus {
+            outline: none;
+            border-color: #007aff;
+        }
+
+        .add-todo button {
+            background-color: rgba(0, 122, 255, 0.6); /* 半透明按钮 */
+            color: white;
+            font-size: 16px;
+            padding: 12px 18px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-todo button:hover {
+            background-color: rgba(0, 81, 168, 0.8);
+        }
+
+        /* Todo 列表项样式 */
+        .todo-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.5); /* 半透明白色 Todo 项背景 */
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .todo-item:hover {
+            background-color: rgba(255, 255, 255, 0.7); /* 增强透明度 */
+        }
+
+        .todo-item .text {
+            flex-grow: 1;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .todo-item .delete-btn {
+            background-color: rgba(255, 59, 48, 0.8); /* 半透明删除按钮 */
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .todo-item .delete-btn:hover {
+            background-color: rgba(209, 44, 35, 0.8);
+        }
+
+        /* 错误消息样式 */
+        .error-message {
+            color: #ff3b30;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Todo List</h1>
+        <div class="add-todo">
+            <input type="text" id="new-todo" placeholder="添加新的 Todo">
+            <button id="add-btn">添加</button>
+        </div>
+        <div class="error-message" id="error-message"></div>
+        <div class="todo-container" id="todo-container">
+            <!-- Todo 列表将在这里动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 获取 DOM 元素
+        const newTodoInput = document.getElementById('new-todo');
+        const addBtn = document.getElementById('add-btn');
+        const todoContainer = document.getElementById('todo-container');
+        const errorMessage = document.getElementById('error-message');
+
+        // 显示错误信息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        // 获取所有 Todo
+        function fetchTodos() {
+            hideError();
+            fetch('http://localhost:5500/todos', { mode: 'cors' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error, status = ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    todoContainer.innerHTML = '';
+                    data.forEach(todo => {
+                        const todoItem = document.createElement('div');
+                        todoItem.className = 'todo-item';
+                        todoItem.innerHTML = `
+                            <span class="text">${todo.text}</span>
+                            <button class="delete-btn" data-id="${todo.id}">删除</button>
+                        `;
+                        todoContainer.appendChild(todoItem);
+                    });
+
+                    // 为删除按钮添加事件监听器
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            deleteTodo(id);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('获取 Todo 失败:', error);
+                    showError('获取 Todo 列表失败，请检查后端服务是否正常运行。');
+                });
+        }
+
+        // 添加新的 Todo
+        function addTodo() {
+            hideError();
+            const text = newTodoInput.value.trim();
+            if (text) {
+                fetch('http://localhost:5500/todos', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error, status = ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    newTodoInput.value = '';
+                    fetchTodos();
+                })
+                .catch(error => {
+                    console.error('创建 Todo 失败:', error);
+                    showError('创建 Todo 失败，请检查后端服务是否正常运行。');
+                });
+            } else {
+                showError('Todo 内容不能为空。');
+            }
+        }
+
+        // 删除 Todo
+        function deleteTodo(id) {
+            hideError();
+            fetch(`http://localhost:5500/todos/${id}`, {
+                method: 'DELETE',
+                mode: 'cors'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error, status = ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                fetchTodos();
+            })
+            .catch(error => {
+                console.error('删除 Todo 失败:', error);
+                showError('删除 Todo 失败，请检查后端服务是否正常运行。');
+            });
+        }
+
+        // 事件监听器
+        addBtn.addEventListener('click', addTodo);
+        newTodoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // 初始加载 Todo 列表
+        fetchTodos();
+    </script>
+</body>
+</html>
