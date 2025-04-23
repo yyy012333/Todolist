@@ -1,18 +1,19 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+require('dotenv').config(); // 加载环境变量
 const app = express();
 
 // 中间件
 app.use(cors()); // 允许所有来源的跨域请求
 app.use(express.json());
 
-// 创建 MySQL 连接池
+// 创建 MySQL 连接池，使用环境变量配置数据库
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'Qxx074688',
-    database: 'todo_app',
+    host: process.env.DB_HOST,      // 使用环境变量
+    user: process.env.DB_USER,      // 使用环境变量
+    password: process.env.DB_PASSWORD, // 使用环境变量
+    database: process.env.DB_NAME,  // 使用环境变量
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -64,7 +65,8 @@ app.delete('/todos/:id', (req, res) => {
         });
 });
 
-const PORT = process.env.PORT || 5500;
+// 监听端口
+const PORT = process.env.PORT || 5500; // 默认端口为5500，或者使用环境变量配置的端口
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
