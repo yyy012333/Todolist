@@ -10,10 +10,10 @@ app.use(express.json());
 
 // 创建 MySQL 连接池，使用环境变量配置数据库
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,      // 使用环境变量
-    user: process.env.DB_USER,      // 使用环境变量
-    password: process.env.DB_PASSWORD, // 使用环境变量
-    database: process.env.DB_NAME,  // 使用环境变量
+    host: process.env.DB_HOST || 'localhost',      // 使用环境变量（本地开发时可使用 localhost）
+    user: process.env.DB_USER || 'root',           // 使用环境变量
+    password: process.env.DB_PASSWORD || '',       // 使用环境变量
+    database: process.env.DB_NAME || 'todo_app',   // 使用环境变量
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -66,7 +66,7 @@ app.delete('/todos/:id', (req, res) => {
 });
 
 // 监听端口
-const PORT = process.env.PORT || 5500; // 默认端口为5500，或者使用环境变量配置的端口
+const PORT = process.env.PORT || 5500; // 使用 Glitch 提供的动态端口或本地默认端口
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
