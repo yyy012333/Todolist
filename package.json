@@ -1,7 +1,7 @@
 {
   "name": "todo-app",
   "version": "1.0.0",
-  "description": "一个使用 Express + MySQL 构建的待办事项管理网站",
+  "description": "A Todo list web app built with Express and MySQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -14,7 +14,13 @@
   "engines": {
     "node": ">=14"
   },
-  "keywords": ["todo", "express", "mysql", "nodejs"],
-  "author": "你的名字",
+  "keywords": [
+    "todo",
+    "express",
+    "mysql",
+    "nodejs",
+    "railway"
+  ],
+  "author": "your-name",
   "license": "MIT"
 }
