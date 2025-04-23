@@ -1,15 +1,16 @@
 {
   "name": "todo-app",
   "version": "1.0.0",
-  "description": "A Todo list web app built with Express and MySQL",
+  "description": "A simple ToDo app with Node.js and MySQL",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mysql2": "^3.14.0"
+    "mysql2": "^3.14.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0"
   },
   "engines": {
     "node": ">=14"
@@ -18,8 +19,7 @@
     "todo",
     "express",
     "mysql",
-    "nodejs",
-    "railway"
+    "nodejs"
   ],
   "author": "your-name",
   "license": "MIT"
